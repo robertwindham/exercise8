@@ -79,12 +79,11 @@ pacman::p_load("leaflet","OpenStreetMap","maps", "sf","tidyverse")
 
 
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
+	echo = FALSE,
 	message = FALSE,
-	warning = FALSE,
-	include = FALSE
+	warning = FALSE
 )
 
 library(ggplot2)
@@ -105,6 +104,15 @@ library(maps)
 ```
 
 
+
+```{r include = FALSE}
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+
+
+
 # Trypanosoma cruzi
 
 The following dataset from Dryad details the distribution of *Trypanosoma cruzi* infections in humans and vectors across the globe. *Trypanosoma cruzi* is a parasite that infects people with the potentially fatal disease, chagas. It is distributed primarily by insects of the Genus *Triatoma*, or "Assassin bugs" or "Kissing Bugs", which are blood sucking insects. I have extracted the data for human infections in Argentina in 2010 and the nearest reported occurences of vectors to infected humans. 
@@ -112,7 +120,7 @@ The following dataset from Dryad details the distribution of *Trypanosoma cruzi*
 
 
 
-![Figure 1. *Trpanosoma cruzi* in human blood](images/chaga.jpg)
+![Figure 1. *Trypanosoma cruzi* in human blood](images/chaga.jpg)
 
 
 ![Figure 2. A few Triotoma species](images/triotoma.jpg)
@@ -157,7 +165,7 @@ vect <- vect[c(8, 10, 11), ]
 
 map_data_es <- map_data('world')[map_data('world')$region == "Argentina",]
 
-ggplot() +
+map1 <- ggplot() +
     ## First layer: worldwide map
     geom_polygon(data = map_data("world"),
                  aes(x=long, y=lat, group = group),
@@ -172,19 +180,17 @@ ggplot() +
                 ylim = c(-56, -21)) +
     ggtitle("A map of Argentina") 
 
+map1
 
 ```
 
 
 
-```{r Campus Imagery, echo=TRUE, message=FALSE, warning=FALSE}
-
+```{r limits, echo=TRUE}
 
 chagamap <- openmap(c(max(chaga2$Latitude_1)+0.2,min(chaga2$Longitude_1)-0.2),c(min(chaga2$Latitude_1)-0.2,max(chaga2$Longitude_1)+0.2),type='bing')
 
 argentina <- openproj(chagamap, projection = "+proj=longlat +ellps=WGS84 +units=m +no_defs")
-
-
 
 ```
 
@@ -193,10 +199,12 @@ argentina <- openproj(chagamap, projection = "+proj=longlat +ellps=WGS84 +units=
 ```{r Simple Campus Map2, echo=TRUE, fig.height=8, fig.width=10, message=FALSE, warning=FALSE}
 
 
-autoplot.OpenStreetMap(argentina) +
+map2 <- autoplot.OpenStreetMap(argentina) +
   geom_point(data=chaga2, aes(x = Longitude_1, y = Latitude_1, color = "red" ), size = 3, alpha = 0.8) +
   labs(title= "Chaga Testing Sites (Argentina 2010)", x="Longtiude", y="Latitude") + theme(legend.position = "none") +
   geom_text(data=chaga2, aes(x = Longitude_1, y = Latitude_1,label=Site_name_1), color="white", vjust=-.75, fontface="bold")
+
+map2
 
 
 ```
@@ -211,7 +219,7 @@ autoplot.OpenStreetMap(argentina) +
 ```{r leaflet simple, echo=TRUE, fig.height=6, fig.width=8, message=FALSE, warning=FALSE}
 
 
-leaflet() %>% 
+map3 <- leaflet() %>% 
   addTiles(group = "OSM")%>%
   addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
   addProviderTiles(providers$Esri.NatGeoWorldMap, group = "NatGeo") %>%
@@ -229,6 +237,8 @@ leaflet() %>%
     baseGroups = c("OSM", "CartoDB", "NatGeo", "ESRI"),
     options = layersControlOptions(collapsed = FALSE))
 
+map3
+
 
 ```
 
@@ -240,8 +250,9 @@ leaflet() %>%
 
 
 
-```{r leaflet simple2, fig.height=6, fig.width=8, message=FALSE, warning=FALSE, cache=FALSE}
-leaflet() %>% 
+```{r leaflet simple2, echo=TRUE, fig.height=6, fig.width=8, message=FALSE, warning=FALSE, cache=FALSE}
+
+map4 <- leaflet() %>% 
   addTiles(group = "OSM")%>%
   addProviderTiles(providers$CartoDB.Positron, group = "CartoDB") %>%
   addProviderTiles(providers$Esri.NatGeoWorldMap, group = "NatGeo") %>%
@@ -266,6 +277,8 @@ leaflet() %>%
   addLayersControl(
     baseGroups = c("OSM", "CartoDB", "NatGeo", "ESRI"),
     options = layersControlOptions(collapsed = FALSE))
+
+map4
 
 ```
 
